@@ -60,4 +60,18 @@ Dette dokument fungerer som vores strategiske køreplan. Her holder vi styr på 
 ## 📝 Udviklings-Checkpoints (Næste opgaver for AI)
 1. [x] Test at `api.cphtechlab.dk` er live igennem Traefik og DNS.
 2. [x] Opret profilen på RapidAPI og forbind det nuværende DAR endpoint (Fase 1).
-3. [ ] Start udviklingen af Fase 2 (CVR Opslag via Datafordeler REST/GraphQL).
+3. [ ] **BLOKERET:** Start udviklingen af Fase 2 (CVR Opslag via Datafordeler REST). *Afventer oprettelse af 'Webservicebruger' med Brugernavn/Adgangskode på Datafordelerens portal.*
+
+### 🚀 Alternative Datakilder (Kræver IKKE login)
+Mens vi venter på Datafordeleren, er her nogle ekstremt stærke, åbne danske API'er, som vi kan koble på vores RapidAPI butik i mellemtiden:
+
+*   **Energi Data Service (energidataservice.dk):** 
+    *   Helt åbent API (Ingen API-nøgle kræves).
+    *   Vi kan levere **Spotpriser på el** (Time for time) og **CO2-udledning** pr. kWh.
+    *   *Salgsværdi:* Enorm! Virksomheder skal bruge dette til ESG-rapportering og intelligent strømstyring.
+*   **Danmarks Statistik (API):**
+    *   Åbent API (Ingen login kræves).
+    *   Demografiske og økonomiske data på postnummer-niveau.
+*   **DAWA Udvidet (Geodata):**
+    *   Vi har allerede adgang via vores nuværende opsætning.
+    *   Vi kan tilføje et "Reverse Geocoding" endpoint (Kunder sender et GPS-koordinat, og vi returnerer nærmeste danske adresse/kommune). Perfekt til logistik og flådestyring.
