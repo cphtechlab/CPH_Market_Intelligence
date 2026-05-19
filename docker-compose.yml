@@ -5,6 +5,8 @@ services:
     build: .
     container_name: market-api
     restart: unless-stopped
+    ports:
+      - "8000:8000"
     env_file:
       - .env
     # Bemærk: Vi exposer ikke direkte ports, Traefik håndterer det internt!
