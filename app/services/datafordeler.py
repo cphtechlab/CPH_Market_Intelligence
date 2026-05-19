@@ -52,4 +52,62 @@ class DatafordelerClient:
             "results": formatted_addresses
         }
 
+    async def reverse_geocode(self, lat: float, lon: float):
+        url = "https://api.dataforsyningen.dk/adgangsadresser/reverse"
+        params = {"x": lon, "y": lat} # DAWA bruger x for længdegrad (lon) og y for breddegrad (lat)
+
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(url, params=params)
+                if response.status_code == 404:
+                    return {"found": False, "message": "Ingen adresse fundet tæt på disse koordinater."}
+                response.raise_for_status()
+                data = response.json()
+                
+                # "Vaskning" af data
+                return {
+                    "found": True,
+                    "adressebetegnelse": data.get("adressebetegnelse", ""),
+                    "vejnavn": data.get("vejstykke", {}).get("navn", ""),
+                    "husnummer": data.get("husnr", ""),
+                    "postnummer": data.get("postnummer", {}).get("nr", ""),
+                    "postnummernavn": data.get("postnummer", {}).get("navn", ""),
+                    "kommunekode": data.get("kommune", {}).get("kode", ""),
+                    "kommunenavn": data.get("kommune", {}).get("navn", "")
+                }
+            except httpx.HTTPStatusError as e:
+                logger.error(f"HTTPStatusError from DAWA reverse: {e.response.status_code} - {e.response.text}")
+                raise
+            except Exception as e:
+                logger.error(f"Error fetching data from DAWA reverse: {e}")
+                raise
+
+    async def get_postal_info(self, zipcode: str):
+        url = f"https://api.dataforsyningen.dk/postnumre/{zipcode}"
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(url)
+                if response.status_code == 404:
+                    return {"found": False, "message": f"Postnummer {zipcode} ikke fundet."}
+                response.raise_for_status()
+                data = response.json()
+                
+                # "Vaskning"
+                kommuner = [{"kode": k.get("kode"), "navn": k.get("navn")} for k in data.get("kommuner", [])]
+                
+                return {
+                    "found": True,
+                    "postnummer": data.get("nr", ""),
+                    "navn": data.get("navn", ""),
+                    "kommuner": kommuner,
+                    "bbox": data.get("visueltcenter", []) # Visuelt center eller bbox hvis tilgængeligt
+                }
+            except httpx.HTTPStatusError as e:
+                logger.error(f"HTTPStatusError from DAWA postnummer: {e.response.status_code} - {e.response.text}")
+                raise
+            except Exception as e:
+                logger.error(f"Error fetching data from DAWA postnummer: {e}")
+                raise
+
 datafordeler_client = DatafordelerClient()

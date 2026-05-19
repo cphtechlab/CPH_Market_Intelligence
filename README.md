@@ -3,10 +3,17 @@
 Dette repository indeholder backend-infrastrukturen for **CPH Market Intelligence** - en robust, skalerbar proxy til formidling og vask af danske B2B offentlige data (CVR, BBR, DAR, etc.) via RapidAPI.
 
 ## 🎯 Formål
-At bygge bro mellem komplekse, legacy-prægede danske offentlige datakilder (Datafordeleren, Dataforsyningen) og moderne internationale AI-agenter, No-Code platforme (Zapier, Make) og udviklere. Vi henter rådata, "vasker" den, og serverer den i et rent, standardiseret JSON-format klar til brug i compliance (KYC/AML), CRM og markedsanalyser.
+At bygge bro mellem komplekse, legacy-prægede danske offentlige datakilder (Datafordeleren, Dataforsyningen, Nationalbanken, Fødevarestyrelsen osv.) og moderne internationale AI-agenter, No-Code platforme (Zapier, Make) og udviklere. Vi henter rådata, "vasker" det, og serverer det i et rent, standardiseret JSON-format klar til brug i compliance (KYC/AML), CRM, logistik og markedsanalyser.
+
+## 🚀 Tilgængelige Endpoints (RapidAPI)
+* **Geodata (DAWA):** Adressevalidering (`/address/validate`), Reverse Geocoding (`/address/reverse`), Postnummer Info (`/postal/{zipcode}`).
+* **Energi & ESG:** El-spotpriser (`/energy/prices`), CO2-udledning (`/energy/co2`).
+* **FoodTech:** Fødevarestyrelsens Smiley Data (`/food/smiley`).
+* **Enterprise Finans & HR:** Valutakurser (`/finance/exchange-rates`), Forbrugerprisindeks (`/finance/cpi`), Helligdage (`/calendar/holidays`).
 
 ## 🛠️ Teknologistak
 * **Framework:** Python FastAPI (Lynhurtigt, asynkront)
+* **Caching:** In-memory caching af tunge XML-dumps (f.eks. Smiley Data) for O(1) opslag.
 * **Deployment:** Docker & Traefik (Hostinger VPS)
 * **Kunder:** RapidAPI (Storefront, API Nøgler, Monetisering)
 
