@@ -7,7 +7,7 @@ Dette dokument fungerer som vores strategiske køreplan. Her holder vi styr på 
 ## ✅ Fase 1: Proof of Concept (Aktiv & Live)
 
 ### 📍 DAR (Danmarks Adresseregister) via DAWA
-* **Status:** 🟢 Live (Lagt på Hostinger `api.cphtechlab.dk`)
+* **Status:** 🚀 LIVE & MONETIZED (Hostinger + RapidAPI)
 * **Endpoint:** `/api/v1/address/validate?q={adresse}`
 * **Data vi leverer:**
   - Valideret adressebetegnelse
@@ -58,6 +58,6 @@ Dette dokument fungerer som vores strategiske køreplan. Her holder vi styr på 
 ---
 
 ## 📝 Udviklings-Checkpoints (Næste opgaver for AI)
-1. [ ] Test at `api.cphtechlab.dk` er live igennem Traefik og DNS.
-2. [ ] Opret profilen på RapidAPI og forbind det nuværende DAR endpoint (Fase 1).
+1. [x] Test at `api.cphtechlab.dk` er live igennem Traefik og DNS.
+2. [x] Opret profilen på RapidAPI og forbind det nuværende DAR endpoint (Fase 1).
 3. [ ] Start udviklingen af Fase 2 (CVR Opslag via Datafordeler REST/GraphQL).
