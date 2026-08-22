@@ -110,4 +110,76 @@ class DatafordelerClient:
                 logger.error(f"Error fetching data from DAWA postnummer: {e}")
                 raise
 
+    async def get_parcel_info(self, matrikelnr: str, ejerlavkode: int):
+        url = "https://api.dataforsyningen.dk/jordstykker"
+        params = {"matrikelnr": matrikelnr, "ejerlavkode": ejerlavkode}
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(url, params=params)
+                response.raise_for_status()
+                data = response.json()
+                
+                if not data:
+                    return {"found": False, "message": f"Matrikel {matrikelnr} under ejerlavkode {ejerlavkode} blev ikke fundet."}
+                
+                # DAWA returnerer en liste af matchende jordstykker (normalt 1)
+                item = data[0]
+                return {
+                    "found": True,
+                    "matrikel_no": item.get("matrikelnr", ""),
+                    "registered_area_m2": item.get("registreretareal", 0),
+                    "area_calculation_method": item.get("arealberegningsmetode", ""),
+                    "ejerlav": {
+                        "kode": item.get("ejerlav", {}).get("kode"),
+                        "navn": item.get("ejerlav", {}).get("navn")
+                    },
+                    "kommune": {
+                        "kode": item.get("kommune", {}).get("kode"),
+                        "navn": item.get("kommune", {}).get("navn")
+                    },
+                    "region": {
+                        "kode": item.get("region", {}).get("kode"),
+                        "navn": item.get("region", {}).get("navn")
+                    },
+                    "sogn": {
+                        "kode": item.get("sogn", {}).get("kode"),
+                        "navn": item.get("sogn", {}).get("navn")
+                    },
+                    "coordinates_center": item.get("visueltcenter", []),
+                    "bbox": item.get("bbox", [])
+                }
+            except httpx.HTTPStatusError as e:
+                logger.error(f"HTTPStatusError from DAWA jordstykker: {e.response.status_code} - {e.response.text}")
+                raise
+            except Exception as e:
+                logger.error(f"Error fetching data from DAWA jordstykker: {e}")
+                raise
+
+    async def search_ejerlav(self, query: str):
+        url = "https://api.dataforsyningen.dk/ejerlav"
+        params = {"q": query}
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(url, params=params)
+                response.raise_for_status()
+                data = response.json()
+                
+                results = []
+                if isinstance(data, list):
+                    for item in data[:15]: # Max 15 for search results
+                        results.append({
+                            "kode": item.get("kode"),
+                            "navn": item.get("navn")
+                        })
+                return {
+                    "count": len(results),
+                    "results": results
+                }
+            except Exception as e:
+                logger.error(f"Error searching ejerlav: {e}")
+                raise
+
 datafordeler_client = DatafordelerClient()
+

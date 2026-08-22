@@ -6,11 +6,14 @@ from app.services.nationalbanken import nationalbanken_client
 from app.services.dst import dst_client
 from app.services.holidays_service import holidays_service
 from app.services.smiley_service import smiley_service
+from app.services.cvr_service import cvr_service
+from app.services.signatory_service import signatory_service
+from app.services.alert_service import alert_service
 import httpx
 
 app = FastAPI(
     title="CPH Market Intelligence API",
-    description="Backend API for RapidAPI, som proxy for danske offentlige data (Datafordeleren).",
+    description="Backend API for RapidAPI, som proxy for danske offentlige data (Datafordeleren, Energi Data, CVR, DST, Nationalbanken m.fl.).",
     version="1.0.0"
 )
 
@@ -152,3 +155,112 @@ async def search_smiley(cvr: str = None, name: str = None):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/api/v1/company/{cvr}")
+async def get_company(cvr: str):
+    """
+    Henter CVR stamdata (Navn, Status, Adresse, Branche osv.) for en dansk virksomhed.
+    """
+    if len(cvr) != 8 or not cvr.isdigit():
+        raise HTTPException(status_code=400, detail="CVR nummer skal være præcis 8 cifre.")
+        
+    try:
+        result = await cvr_service.get_company_by_cvr(cvr)
+        if not result.get("found"):
+            raise HTTPException(status_code=404, detail=result.get("message"))
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/api/v1/company/{cvr}/compliance")
+async def get_company_compliance(cvr: str):
+    """
+    Henter AML/Compliance detaljer (Reelle ejere, tegningsregler og risikovurdering).
+    """
+    if len(cvr) != 8 or not cvr.isdigit():
+        raise HTTPException(status_code=400, detail="CVR nummer skal være præcis 8 cifre.")
+        
+    try:
+        result = await cvr_service.get_company_compliance(cvr)
+        if not result.get("found"):
+            raise HTTPException(status_code=404, detail=result.get("message"))
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/api/v1/property/parcel")
+async def get_parcel(matrikelnr: str, ejerlavkode: int):
+    """
+    Henter ejerlaug, region, kommune, sogn og grundareal (m2) for et specifikt matrikelnummer og ejerlaugkode.
+    """
+    if not matrikelnr or not ejerlavkode:
+        raise HTTPException(status_code=400, detail="Både 'matrikelnr' og 'ejerlavkode' er påkrævede query parametre.")
+        
+    try:
+        result = await datafordeler_client.get_parcel_info(matrikelnr=matrikelnr, ejerlavkode=ejerlavkode)
+        if not result.get("found"):
+            raise HTTPException(status_code=404, detail=result.get("message"))
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/api/v1/property/ejerlav")
+async def search_ejerlav(q: str):
+    """
+    Søger efter danske ejerlaug ud fra navn (q) for at finde den korrekte ejerlavkode.
+    """
+    if not q:
+        raise HTTPException(status_code=400, detail="Query parameter 'q' er påkrævet.")
+        
+    try:
+        result = await datafordeler_client.search_ejerlav(query=q)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/api/v1/company/{cvr}/signatories")
+async def get_company_signatories(cvr: str):
+    """
+    Kører rule-based parsing på en virksomheds tegningsregel og leverer strukturerede, maskinlæsbare tegningskrav.
+    """
+    if len(cvr) != 8 or not cvr.isdigit():
+        raise HTTPException(status_code=400, detail="CVR nummer skal være præcis 8 cifre.")
+        
+    try:
+        result = await signatory_service.get_company_signatories(cvr)
+        if not result.get("found"):
+            raise HTTPException(status_code=404, detail=result.get("message"))
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/api/v1/company/{cvr}/alerts")
+async def get_company_alerts(cvr: str):
+    """
+    Overvåger virksomhedsstatus, konkursdekret-risici og returnerer et samlet risikosignal (risk_score).
+    """
+    if len(cvr) != 8 or not cvr.isdigit():
+        raise HTTPException(status_code=400, detail="CVR nummer skal være præcis 8 cifre.")
+        
+    try:
+        result = await alert_service.get_company_alerts(cvr)
+        if not result.get("found"):
+            raise HTTPException(status_code=404, detail=result.get("message"))
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/api/v1/energy/mix")
+async def get_grid_mix():
+    """
+    Henter live grøn elnets-fordeling i Danmark (vind, sol, biomasse, kul) samt CO2-aftryk.
+    """
+    try:
+        result = await energi_data_client.get_realtime_grid_mix()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+
+

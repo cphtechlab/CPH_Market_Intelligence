@@ -7,10 +7,11 @@ Dette dokument fungerer som vores strategiske køreplan. Her holder vi styr på 
 ## 💰 Forretningsmodel & Passiv Indkomst (RapidAPI)
 Vores overordnede mål er at skabe **passiv indkomst** ved at hoste og videresælge adgang til komplekse danske og internationale datasæt igennem vores RapidAPI-storefront under brandet **CPH Techlab**. 
 
-* **Prisstruktur:** Vi opererer med et 'Freemium' koncept.
-  - **Free:** Begrænset antal kald, til test.
-  - **Pro ($9/md):** Mellemstore behov (f.eks. 5.000 kald).
-  - **Enterprise ($99/md):** Massiv volumen, ubegrænset markedsdata og tung B2B validering (100.000+ kald). Udbetalingen går direkte ind via PayPal.
+* **Prisstruktur (RapidAPI):** Vi opererer med et 'Freemium' koncept med 4 niveauer.
+  - **BASIC ($0/md):** 100 kald/md (Til test og udviklere).
+  - **PRO ($9/md):** 5.000 kald/md (Mellemstore behov).
+  - **ULTRA ($49/md):** 50.000 kald/md (Til startups og apps med pæn trafik).
+  - **MEGA ($99/md):** 250.000+ kald/md (Enterprise niveau, ubegrænset markedsdata og tung B2B validering). Udbetalingen går direkte ind via PayPal.
 * **Skalering:** Jo flere værdifulde datakilder (connectors) vi bygger ind i API'et, desto flere kunder tiltrækker vi. I takt med udvidelsen kan vi opgradere pakkerne og tjene mere.
 * **Den Gyldne Regel ("Vaskningen"):** Vores primære værdi (og dét kunderne betaler for) er formidlingen. Alt data vi trækker (uanset kilden) **SKAL** altid vaskes, struktureres og leveres med et kommercielt kundemindset. Det skal være så "Plug & Play" for internationale udviklere, No-Code platforme (Zapier/Make) og AI-agenter, at de med glæde betaler frem for selv at kæmpe med rodet, offentlig infrastruktur.
 
